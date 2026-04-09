@@ -1,10 +1,10 @@
 """
-Analizador de Gramáticas: Cálculo de PRIMEROS, SIGUIENTES y PREDICCIÓN.
+primeros siguientes y prediccion
 """
 
 from typing import Dict, List, Set, Tuple
 
-# Constantes para símbolos especiales
+# constantes para simbolos especiales
 VACIO = "ε"
 FIN_CADENA = "$"
 
