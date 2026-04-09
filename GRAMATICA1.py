@@ -1,8 +1,7 @@
 """
-Algoritmos para calcular conjuntos PRIMEROS, SIGUIENTES y PREDICCIÓN
-de una gramática libre de contexto.
-
-Gramática de ejemplo:
+EJERCICIO 1 PRESENTACION 6
+algoritmos para primeros siguientes y prediccion
+primera gramatica de la presentacion 6
   S -> A uno B C
   S -> S dos
   A -> B C D
@@ -15,30 +14,16 @@ Gramática de ejemplo:
   D -> seis
   D -> ε
 """
-
 from typing import Dict, List, Set, Tuple
-
-# Símbolo especial para cadena vacía y fin de entrada
+# el simobolo para cadena vacia y fin de cadena
 EPSILON = "ε"
 EOF = "$"
 
-
 # Representación de la gramática
-
 def build_grammar() -> Tuple[str, List[str], List[str], Dict[str, List[List[str]]]]:
-    """
-    Retorna (axioma, no_terminales, terminales, producciones).
-
-    producciones: dict  NT  ->  lista de alternativas
-                  cada alternativa es una lista de símbolos
-                  (usa [EPSILON] para la producción vacía)
-    """
     axioma = "S"
-
     no_terminales = ["S", "A", "B", "C", "D"]
-
     terminales = ["uno", "dos", "tres", "cuatro", "cinco", "seis"]
-
     producciones: Dict[str, List[List[str]]] = {
         "S": [
             ["A", "uno", "B", "C"],
@@ -82,17 +67,6 @@ def calcular_primeros(
     no_terminales: List[str],
     producciones: Dict[str, List[List[str]]],
 ) -> Dict[str, Set[str]]:
-    """
-    Calcula PRIMERO(X) para cada no-terminal X.
-
-    Algoritmo de punto fijo:
-      1. Inicializa PRIMERO(X) = {} para todo X.
-      2. Repite hasta estabilización:
-         Para cada producción X -> Y1 Y2 ... Yk:
-           - Agrega PRIMERO(Y1) - {ε} a PRIMERO(X).
-           - Si ε en PRIMERO(Y1), agrega PRIMERO(Y2) - {ε}, etc.
-           - Si ε en PRIMERO(Yi) para todo i, agrega ε a PRIMERO(X).
-    """
     primeros: Dict[str, Set[str]] = {nt: set() for nt in no_terminales}
 
     cambio = True
@@ -135,10 +109,6 @@ def primero_de_cadena(
     primeros: Dict[str, Set[str]],
     no_terminales: List[str],
 ) -> Set[str]:
-    """
-    Calcula PRIMERO(α) para una cadena α = Y1 Y2 ... Yk.
-    Útil para calcular conjuntos PREDICCIÓN.
-    """
     resultado: Set[str] = set()
     todos_anulables = True
 
@@ -161,23 +131,14 @@ def primero_de_cadena(
     return resultado
 
 
-# SIGUIENTES
-
+# algoritmo de siguientes
 def calcular_siguientes(
     axioma: str,
     no_terminales: List[str],
     producciones: Dict[str, List[List[str]]],
     primeros: Dict[str, Set[str]],
 ) -> Dict[str, Set[str]]:
-    """
-    Calcula SIGUIENTE(X) para cada no-terminal X.
-
-    Reglas:
-      1. SIGUIENTE(axioma) incluye $.
-      2. Para cada producción A -> α X β:
-           - Agrega PRIMERO(β) - {ε} a SIGUIENTE(X).
-           - Si ε en PRIMERO(β) (o β es vacío), agrega SIGUIENTE(A) a SIGUIENTE(X).
-    """
+  
     siguientes: Dict[str, Set[str]] = {nt: set() for nt in no_terminales}
     siguientes[axioma].add(EOF)
 
@@ -214,7 +175,7 @@ def calcular_siguientes(
     return siguientes
 
 
-# PREDICCIÓN
+# algoritmo de prediccion
 
 def calcular_prediccion(
     no_terminales: List[str],
@@ -222,15 +183,7 @@ def calcular_prediccion(
     primeros: Dict[str, Set[str]],
     siguientes: Dict[str, Set[str]],
 ) -> Dict[str, Dict[int, Set[str]]]:
-    """
-    Calcula PREDICCIÓN(A -> α) para cada regla.
-
-    PRED(A -> α) =
-      PRIMERO(α) - {ε}
-      U  (si ε en PRIMERO(α)):  SIGUIENTE(A)
-
-    Retorna dict:  NT  ->  { índice_alternativa: conjunto }
-    """
+  
     prediccion: Dict[str, Dict[int, Set[str]]] = {}
 
     for nt, alternativas in producciones.items():
@@ -244,15 +197,12 @@ def calcular_prediccion(
 
     return prediccion
 
-# Presentación de resultados
-
 def _fmt(conjunto: Set[str]) -> str:
-    """Formatea un conjunto ordenando sus elementos."""
     orden = {"ε": "0", "$": "1"}
     elementos = sorted(conjunto, key=lambda x: orden.get(x, "2" + x))
     return "{ " + ", ".join(elementos) + " }"
 
-
+#resultados de primeros
 def imprimir_primeros(
     no_terminales: List[str],
     primeros: Dict[str, Set[str]],
@@ -261,7 +211,7 @@ def imprimir_primeros(
     for nt in no_terminales:
         print(f"  PRIMERO({nt}) = {_fmt(primeros[nt])}")
 
-
+#resultados de siguientes
 def imprimir_siguientes(
     no_terminales: List[str],
     siguientes: Dict[str, Set[str]],
@@ -286,7 +236,7 @@ def imprimir_prediccion(
             regla_global += 1
 
 
-# Punto de entrada
+
 
 def main() -> None:
     axioma, no_terminales, terminales, producciones = build_grammar()
@@ -298,16 +248,16 @@ def main() -> None:
             print(f"  [{regla_n:2d}] {nt} -> {' '.join(alt)}")
             regla_n += 1
 
-    # 1. PRIMEROS
+    # algoritmo primeros
     primeros = calcular_primeros(no_terminales, producciones)
     print()
     imprimir_primeros(no_terminales, primeros)
 
-    # 2. SIGUIENTES
+    # algoritmo siguientes
     siguientes = calcular_siguientes(axioma, no_terminales, producciones, primeros)
     imprimir_siguientes(no_terminales, siguientes)
 
-    # 3. PREDICCIÓN
+    # algoritmo prediccion
     prediccion = calcular_prediccion(
         no_terminales, producciones, primeros, siguientes
     )
