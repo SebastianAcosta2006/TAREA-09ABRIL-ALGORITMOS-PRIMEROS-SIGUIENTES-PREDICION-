@@ -1,6 +1,5 @@
 """
 Analizador de Gramáticas: Cálculo de PRIMEROS, SIGUIENTES y PREDICCIÓN.
-Misma gramática, misma lógica, estilo de código renovado (POO).
 """
 
 from typing import Dict, List, Set, Tuple
@@ -11,7 +10,6 @@ FIN_CADENA = "$"
 
 class AnalizadorGramatical:
     def __init__(self):
-        # Mantenemos EXACTAMENTE tu segunda gramática
         self.axioma = "S"
         self.no_terminales = ["S", "A", "B", "C", "D"]
         self.terminales = ["uno", "dos", "tres", "cuatro", "cinco", "seis"]
@@ -39,7 +37,6 @@ class AnalizadorGramatical:
             ],
         }
         
-        # Diccionarios para almacenar los conjuntos resultantes
         self.primeros: Dict[str, Set[str]] = {nt: set() for nt in self.no_terminales}
         self.siguientes: Dict[str, Set[str]] = {nt: set() for nt in self.no_terminales}
 
@@ -56,12 +53,12 @@ class AnalizadorGramatical:
                 break
             
             if not self.es_no_terminal(simbolo):
-                # Es un terminal
+            
                 resultado.add(simbolo)
                 puede_ser_vacio = False
                 break
             else:
-                # Es un no terminal, tomamos sus PRIMEROS (menos el vacío)
+               
                 conjunto_nt = self.primeros[simbolo]
                 resultado.update(conjunto_nt - {VACIO})
                 
@@ -82,7 +79,7 @@ class AnalizadorGramatical:
                 tamanio_inicial = len(self.primeros[nt])
                 
                 for der in alternativas:
-                    # Agregamos los primeros calculados de la producción actual
+                  
                     self.primeros[nt].update(self.obtener_primero_secuencia(der))
                 
                 if len(self.primeros[nt]) > tamanio_inicial:
@@ -104,18 +101,18 @@ class AnalizadorGramatical:
                         if self.es_no_terminal(simbolo):
                             tamanio_previo = len(self.siguientes[simbolo])
                             
-                            # Analizamos la parte que sigue al símbolo actual: B -> alfa X beta
+                           
                             resto = cuerpo[i + 1:]
                             
                             if not resto:
-                                # Caso X al final de la regla: SIGUIENTE(X) contiene SIGUIENTE(Cabeza)
+                                
                                 self.siguientes[simbolo].update(self.siguientes[cabeza])
                             else:
-                                # Caso X seguido de algo: SIGUIENTE(X) contiene PRIMERO(resto) \ {ε}
+                               
                                 primeros_del_resto = self.obtener_primero_secuencia(resto)
                                 self.siguientes[simbolo].update(primeros_del_resto - {VACIO})
                                 
-                                # Si el resto puede ser vacío, también hereda SIGUIENTE(Cabeza)
+                                
                                 if VACIO in primeros_del_resto:
                                     self.siguientes[simbolo].update(self.siguientes[cabeza])
                             
@@ -136,10 +133,10 @@ class AnalizadorGramatical:
                 mapa_prediccion[nt].append(p_set)
         return mapa_prediccion
 
-# --- Utilidades Visuales ---
+
 
 def formatear(conjunto: Set[str]) -> str:
-    # Ordenar: ε primero, luego $, luego alfabético
+   
     prioridad = {VACIO: "0", FIN_CADENA: "1"}
     ordenados = sorted(list(conjunto), key=lambda x: prioridad.get(x, "2" + x))
     return "{ " + ", ".join(ordenados) + " }"
@@ -154,7 +151,7 @@ def ejecutar_programa():
             print(f"  ({conteo:2d}) {nt} -> {' '.join(a)}")
             conteo += 1
 
-    # Ejecución de los algoritmos
+    
     app.calcular_todos_los_primeros()
     app.calcular_todos_los_siguientes()
     predicciones = app.generar_predicciones()
